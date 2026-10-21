@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f6f5c">
+<title>우리 집 마련 플래너</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f2f5f3;--card:#fff;--ink:#1c2a28;--mute:#5e6f6b;--line:#d9e2de;
+  --pine:#1f6f5c;--pine-ink:#fff;--pine-soft:#e1f0ea;
+  --amber:#8f5a00;--amber-soft:#fbefd5;--red:#b23a2a;--red-soft:#f8e1dd;--blue:#3b55a5;
+  --c1:#1f6f5c;--c2:#c27a0a;--c3:#4a62b3;
+  --r:10px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#111816;--card:#1a2321;--ink:#e6efec;--mute:#9bb0aa;--line:#2e3c38;
+  --pine:#52bd9f;--pine-ink:#06201a;--pine-soft:#173a30;
+  --amber:#e6b560;--amber-soft:#3a2c10;--red:#f08a7a;--red-soft:#3d1c17;--blue:#8aa2ee;
+  --c1:#52bd9f;--c2:#e6b560;--c3:#8aa2ee;
+}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Noto Sans KR",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  padding:env(safe-area-inset-top,0) 0 calc(72px + env(safe-area-inset-bottom,0));font-variant-numeric:tabular-nums}
+header{position:sticky;top:0;z-index:20;background:var(--pine);color:var(--pine-ink);padding:calc(10px + env(safe-area-inset-top,0)) 14px 10px;display:flex;align-items:center;gap:10px}
+header h1{font-size:17px;margin:0;flex:1;font-weight:700;letter-spacing:-.01em}
+.chip{font-size:12px;padding:3px 9px;border-radius:99px;background:rgba(255,255,255,.18);white-space:nowrap}
+.chip.err{background:var(--red);color:#fff}
+.iconbtn{background:rgba(255,255,255,.18);border:0;color:inherit;border-radius:8px;padding:6px 10px;font:inherit;cursor:pointer}
+main{max-width:1000px;margin:0 auto;padding:12px}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0)}
+nav button{flex:1;border:0;background:none;color:var(--mute);padding:10px 2px 9px;font:inherit;font-size:13px;cursor:pointer;border-top:3px solid transparent}
+nav button[aria-current=true]{color:var(--pine);font-weight:700;border-top-color:var(--pine)}
+h2{font-size:18px;margin:6px 0 10px}
+h3{font-size:15px;margin:0 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-bottom:12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end}
+.row>*{flex:1 1 130px;min-width:0}
+.row>.sm{flex:0 1 90px}
+.row>.fit{flex:0 0 auto}
+label.f{display:block;font-size:12px;color:var(--mute)}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 9px;margin-top:2px}
+textarea{min-height:56px;resize:vertical}
+input[type=checkbox],input[type=radio]{width:auto;margin:0 6px 0 0;accent-color:var(--pine)}
+:focus-visible{outline:2px solid var(--pine);outline-offset:1px}
+label.chk{display:inline-flex;align-items:center;font-size:14px;margin:4px 12px 4px 0;cursor:pointer}
+button.b{font:inherit;border:1px solid var(--pine);background:var(--pine);color:var(--pine-ink);border-radius:8px;padding:8px 12px;cursor:pointer}
+button.b.ghost{background:none;color:var(--pine)}
+button.b.danger{border-color:var(--red);color:var(--red);background:none}
+button.b.sm{padding:4px 9px;font-size:13px}
+.hint{font-size:12px;color:var(--mute);margin:2px 0 0}
+.big{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.badge{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;font-weight:700;vertical-align:middle}
+.badge.off{background:var(--pine-soft);color:var(--pine)}
+.badge.apx{background:var(--amber-soft);color:var(--amber)}
+.badge.bad{background:var(--red-soft);color:var(--red)}
+.badge.ok{background:var(--pine-soft);color:var(--pine)}
+.badge.mid{background:var(--bg);color:var(--mute);border:1px solid var(--line)}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.sum>div{background:var(--bg);border-radius:8px;padding:8px 10px}
+.sum small{display:block;color:var(--mute);font-size:12px}
+.pos{color:var(--pine)}.neg{color:var(--red)}
+.warn{border-left:4px solid var(--amber);background:var(--amber-soft);color:var(--ink);padding:6px 10px;border-radius:6px;margin:6px 0;font-size:14px}
+.warn.red{border-left-color:var(--red);background:var(--red-soft)}
+.warn.info{border-left-color:var(--blue);background:var(--bg)}
+.check{display:flex;gap:6px;font-size:14px;margin:3px 0}
+.check b{flex:0 0 18px}
+details{margin:8px 0}
+summary{cursor:pointer;font-weight:500;color:var(--pine)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:right;vertical-align:top}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card);min-width:112px}
+th{font-weight:700;background:var(--card)}
+td.best{background:var(--pine-soft);font-weight:700}
+td.worst{color:var(--red)}
+td.txt{text-align:left;font-size:13px;min-width:170px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin-top:4px}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+svg text{fill:var(--mute);font-size:11px}
+.ln{fill:none;stroke-width:2.4}
+.ln.c1{stroke:var(--c1)}.ln.c2{stroke:var(--c2)}.ln.c3{stroke:var(--c3)}
+.grid{stroke:var(--line);stroke-width:1}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.empty{color:var(--mute);text-align:center;padding:18px 8px}
+a{color:var(--blue)}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);max-width:520px;width:calc(100% - 24px);padding:16px}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+footer{max-width:1000px;margin:0 auto;padding:4px 12px 20px;color:var(--mute);font-size:12px}
+@media print{header,nav,.noprint{display:none!important}body{padding:0}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header>
+  <h1>우리 집 마련 플래너</h1>
+  <span id="sync" class="chip">로컬</span>
+  <button class="iconbtn" id="btnCfg" aria-label="설정">⚙ 설정</button>
+</header>
+<main id="app"></main>
+<footer>
+  정책·금리는 수시로 바뀝니다. 신청 전 공식 공고로 다시 확인하세요:
+  <a href="https://nhuf.molit.go.kr" target="_blank" rel="noopener">주택도시기금</a> ·
+  <a href="https://www.hf.go.kr" target="_blank" rel="noopener">한국주택금융공사</a> ·
+  <a href="https://www.myhome.go.kr" target="_blank" rel="noopener">마이홈포털</a> ·
+  <a href="https://rt.molit.go.kr" target="_blank" rel="noopener">실거래가 공개시스템</a>.
+  이 앱의 계산은 참고용이며 금융·세무·법률 자문이 아닙니다.
+</footer>
+<nav id="nav"></nav>
+
+<dialog id="dlg">
+  <h3>연결 · 백업 설정</h3>
+  <label class="f">내 이름 (수정자로 기록됩니다)<input id="cfgMe" placeholder="예: 동균"></label>
+  <label class="f">Apps Script 웹 앱 URL (…/exec)<input id="cfgUrl" placeholder="https://script.google.com/macros/s/…/exec"></label>
+  <label class="f">액세스 키 (Code.gs의 ACCESS_KEY와 같은 값)<input id="cfgKey" type="password" autocomplete="off"></label>
+  <label class="f">마감 알림 받을 이메일 (쉼표로 구분, 선택)<input id="cfgMail" placeholder="a@example.com, b@example.com"></label>
+  <p class="hint">URL·키는 이 기기 브라우저에만 저장됩니다(GitHub에 올라가지 않음). 소득·자산 정보가 들어가므로 키를 공개하지 마세요.</p>
+  <div class="row" style="margin-top:10px">
+    <button class="b fit" id="cfgSave">저장하고 연결</button>
+    <button class="b ghost fit" id="cfgClose">닫기</button>
+  </div>
+  <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+  <div class="row">
+    <button class="b ghost fit" id="btnExport">백업 내려받기(JSON)</button>
+    <button class="b ghost fit" id="btnImport">백업 불러오기</button>
+    <button class="b danger fit" id="btnReset">이 기기 데이터 초기화</button>
+  </div>
+  <input type="file" id="fileImport" accept="application/json" hidden>
+</dialog>
+
+<script>
+/* ═════════════ 공식 정책 기준 (정책이 바뀌면 이 블록만 수정) ═════════════
+   확인일: 2026-10-21
+   ▸ 디딤돌: 주택도시기금 안내(경기주거복지포털 게재본·마이홈포털 대조)
+   ▸ 보금자리론: 한국주택금융공사 안내(경기주거복지포털 게재본)
+   단위: 금액은 모두 '만원' */
+const POLICY = {
+  verified: '2026-10-21',
+  didimdol: {
+    label: '내집마련 디딤돌대출', org: '주택도시기금(국토교통부)',
+    src: [
+      ['경기주거복지포털 · 디딤돌 안내', 'https://housing.gg.go.kr/html/24208.do'],
+      ['마이홈포털 · 디딤돌 안내', 'https://www.myhome.go.kr/hws/portal/cont/selectSteppingStoneLoanView.do'],
+      ['주택도시기금(신청·최신 공고)', 'https://nhuf.molit.go.kr']
+    ],
+    netAsset: 51100, floor: 1.5,
+    terms: [10, 15, 20, 30],
+    // [연소득 상한, [10년,15년,20년,30년 금리]]
+    rates: [[2000,[2.85,2.90,3.05,3.10]],[4000,[3.20,3.30,3.40,3.45]],[7000,[3.55,3.65,3.75,3.80]],[8500,[3.90,4.00,4.10,4.15]]],
+    modes: [['var','변동/5년 단위 변동 · 표 금리 기준 (+0%p)',0,'variable'],
+            ['var5','5년 단위 변동 선택 (+0.1%p)',0.1,'variable'],
+            ['fix10','10년 고정 적용 (+0.2%p)',0.2,'fixed'],
+            ['fixed','순수 고정 선택 (+0.3%p)',0.3,'fixed']],
+    manual: ['무주택 세대주(대출 신청일 기준)', '주택 매매계약 체결 후 신청', '대출 후 1개월 내 전입 · 2년 이상 실거주', '대출 기간 중 1주택 유지']
+  },
+  bogeum: {
+    label: '보금자리론', org: '한국주택금융공사',
+    src: [
+      ['경기주거복지포털 · 보금자리론 안내', 'https://housing.gg.go.kr/html/24217.do'],
+      ['한국주택금융공사(월별 공시금리)', 'https://www.hf.go.kr']
+    ],
+    terms: [10, 15, 20, 30, 40, 50],
+    manual: ['한국신용정보원 규약 해당사항 없음 · CB점수 271점 이상', '채무자·배우자 주택 보유 수: 담보주택 제외 무주택 또는 1주택', '만기 50년은 만 40세 미만 등 조건부']
+  }
+};
+
+/* ═════════════ 상태 ═════════════ */
+const LS = 'homePlanner.v1', LSC = 'homePlanner.cfg', LSD = 'homePlanner.dirty';
+const $ = (s, r = document) => r.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2, 10);
+const now = () => Date.now();
+const num = v => { const n = Number(v); return isFinite(n) ? n : 0; };
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const won = v => { v = Math.round(num(v)); if (!v) return '0원'; const neg = v < 0; v = Math.abs(v); const e = Math.floor(v / 10000), m = v % 10000, a = []; if (e) a.push(e.toLocaleString() + '억'); if (m) a.push(m.toLocaleString() + '만'); return (neg ? '-' : '') + a.join(' ') + '원'; };
+const pct = v => (Math.round(num(v) * 100) / 100).toFixed(2) + '%';
+
+const DEFAULT_CHECK = ['무주택·세대 구성 확인 (주민등록등본)', '부부 소득·순자산 확인 (정책대출 자격)', '청약저축 가입·납입 내역 확인', '은행 대출 한도 사전 조회', '디딤돌 자격 사전 확인 (주택도시기금)', '보금자리론 모의심사 (한국주택금융공사)', '관심 단지 임장 · 실거래가 확인', '자금조달계획서 준비', '계약금 이체 · 매매계약서 작성', '대출 신청 (수탁은행 상담)', '잔금 · 소유권이전등기 · 전입신고', '취득세 신고·납부'];
+
+function defState() {
+  const t = 1;
+  return {
+    people: [{ id: 'p1', name: '나', income: 0, debt: 0, updatedAt: t }, { id: 'p2', name: '여자친구', income: 0, debt: 0, updatedAt: t }],
+    capital: [], listings: [], loans: [],
+    checklist: DEFAULT_CHECK.map((title, i) => ({ id: 'c' + i, title, owner: '', due: '', done: false, note: '', updatedAt: t })),
+    scenarios: [1, 2, 3].map(i => ({ id: 's' + i, name: i + '번 시나리오', listingId: '', lines: [], memo: '', updatedAt: t })),
+    settings: { _u: t, reserve: 3000, acqTax: 1.1, broker: 0.4, legal: 0.2, moving: 300, metro: true, marriage: '', emails: '',
+      w: { walk: 3, south: 3, school: 2, park: 2, parking: 2, year: 1 } },
+    decision: { _u: t, picked: '', memo: '', ack: {} }
+  };
+}
+function normalize(s) {
+  const d = defState(); s = s || d;
+  for (const k of ['people', 'capital', 'listings', 'loans', 'checklist', 'scenarios']) if (!Array.isArray(s[k])) s[k] = d[k];
+  s.settings = Object.assign({}, d.settings, s.settings || {}); s.settings.w = Object.assign({}, d.settings.w, (s.settings || {}).w || {});
+  s.decision = Object.assign({}, d.decision, s.decision || {}); s.decision.ack = s.decision.ack || {};
+  d.scenarios.forEach(x => { if (!s.scenarios.find(y => y.id === x.id)) s.scenarios.push(x); });
+  s.scenarios.sort((a, b) => a.id.localeCompare(b.id));
+  return s;
+}
+let S = normalize(JSON.parse(localStorage.getItem(LS) || 'null'));
+let cfg = JSON.parse(localStorage.getItem(LSC) || '{}');
+let ver = 0, dirty = localStorage.getItem(LSD) === '1', syncing = false, again = false, tab = 'capital', pendingRender = false;
+const openSet = new Set(JSON.parse(sessionStorage.getItem('open') || '[]'));
+const me = () => cfg.me || '나';
+const touch = it => { it.updatedAt = now(); it.by = me(); };
+const live = k => S[k].filter(x => !x.deleted);
+const totalIncome = () => live('people').reduce((a, p) => a + num(p.income), 0);
+const pname = id => (S.people.find(p => p.id === id) || {}).name || '';
+
+/* ═════════════ 계산 ═════════════ */
+function schedule(L, amount, add = 0) {
+  const n = Math.round(num(L.years) * 12); amount = num(amount);
+  if (!n || !amount) return [];
+  const g = Math.min(n - 1, Math.round(num(L.grace) * 12)), st = L.rateStep;
+  let bal = amount; const rows = [];
+  for (let m = 1; m <= n; m++) {
+    let rate = num(L.rate); if (st && m > st.afterMonths) rate = num(st.rate2);
+    rate += add; const r = Math.max(0, rate) / 1200, int = bal * r; let prin = 0;
+    if (L.method === 'bullet') prin = m === n ? bal : 0;
+    else if (m <= g) prin = 0;
+    else { const rem = n - m + 1; if (L.method === 'principal') prin = bal / rem; else { const pmt = r ? bal * r / (1 - Math.pow(1 + r, -rem)) : bal / rem; prin = pmt - int; } }
+    if (m === n) prin = bal;
+    bal -= prin; rows.push({ m, pay: int + prin, int, prin, bal: Math.max(0, bal) });
+  }
+  return rows;
+}
+const sum = a => a.reduce((x, y) => x + y, 0);
+
+function calcDidimdol(o, c) {
+  const P = POLICY.didimdol, ch = num(o.children), multi = ch >= 2, inc = c.income;
+  const incLimit = Math.max(6000, (o.first || multi) ? 7000 : 0, o.newly ? 8500 : 0);
+  const priceLimit = (o.newly || multi) ? 60000 : 50000;
+  const cap = Math.max(20000, o.first ? 24000 : 0, (o.newly || multi) ? 32000 : 0);
+  const ltv = (o.first && !c.metro) ? 80 : 70;
+  const checks = [];
+  checks.push([inc > 0 && inc <= incLimit, `부부합산 연소득 ${won(inc)} (기준 ${won(incLimit)} 이하)` + (inc <= 0 ? ' — 자본 탭에 소득 입력 필요' : '')]);
+  checks.push([num(o.netAsset) <= P.netAsset, `순자산 ${won(o.netAsset)} (기준 ${won(P.netAsset)} 이하)`]);
+  if (c.price) checks.push([c.price <= priceLimit, `주택가격 ${won(c.price)} (기준 ${won(priceLimit)} 이하 · 기금은 담보 평가액 기준)`]);
+  if (c.areaM2) checks.push([c.areaM2 <= 85, `전용면적 ${c.areaM2}㎡ (기준 85㎡ 이하)`]);
+  const ti = P.terms.indexOf(num(o.term)), row = P.rates.find(r => inc <= r[0]) || P.rates[P.rates.length - 1];
+  const mode = P.modes.find(m => m[0] === o.mode) || P.modes[0];
+  let base = row[1][ti < 0 ? 3 : ti] + mode[2]; if (!c.metro) base -= 0.2;
+  const ch2 = ch >= 3 ? 0.7 : ch === 2 ? 0.5 : ch === 1 ? 0.3 : 0;
+  const pref = Math.max(o.newly ? 0.2 : 0, o.first ? 0.2 : 0, ch2);
+  const add = num(o.savings) + (o.eContract ? 0.1 : 0);
+  const capPref = ch >= 3 ? 0.7 : 0.5, tot = Math.min(capPref, pref + add);
+  const rate = Math.max(P.floor, base - tot), rate2 = Math.max(P.floor, base);
+  const max = Math.round(c.price ? Math.min(cap, c.price * ltv / 100) : cap);
+  const notes = [`한도 = 상품 한도 ${won(cap)}와 매매가×LTV ${ltv}% 중 작은 금액 (심사 시 DTI 60%·선순위채권 추가 반영)`,
+    `우대금리(${pct(tot)}p)는 최대 5년 적용 → 이후 ${pct(rate2)}로 상승한다고 가정(보수적)`, `최저금리 ${P.floor}% 하한 적용`];
+  return { checks, ok: checks.every(x => x[0]), max, rate, rate2: rate2 > rate ? rate2 : null, rateType: mode[3], notes, manual: P.didimdol ? [] : POLICY.didimdol.manual };
+}
+function calcBogeum(o, c) {
+  const ch = num(o.children), inc = c.income;
+  const incLimit = Math.max(7000, o.newly ? 8500 : 0, ch === 1 ? 8000 : 0, ch === 2 ? 9000 : 0, ch >= 3 ? 10000 : 0);
+  const cap = Math.max(36000, ch >= 3 ? 40000 : 0, o.first ? 42000 : 0);
+  const ltv = o.first ? 80 : 70;
+  const checks = [];
+  checks.push([inc > 0 && inc <= incLimit, `부부합산 연소득 ${won(inc)} (기준 ${won(incLimit)} 이하)` + (inc <= 0 ? ' — 자본 탭에 소득 입력 필요' : '')]);
+  if (c.price) checks.push([c.price <= 60000, `주택가격 ${won(c.price)} (기준 6억원 이하)`]);
+  const base = num(o.baseRate) || 4.1;
+  const p1 = o.newly ? 0.2 : (o.newborn ? 0.2 : 0), p2 = Math.min(2, num(o.social)) * 0.7, p3 = o.green ? 0.1 : 0;
+  const tot = Math.min(1, p1 + p2 + p3), rate = Math.max(0, base - tot);
+  const max = Math.round(c.price ? Math.min(cap, c.price * ltv / 100) : cap);
+  const notes = [`한도 = 상품 한도 ${won(cap)}와 매매가×LTV ${ltv}% 중 작은 금액`,
+    '⚠️ LTV 70%(생애최초 80%)·DTI 60%는 공식 안내 본문에서 확인하지 못한 2차 자료 기준입니다 — 한국주택금융공사 모의심사로 확인하세요',
+    '공시금리는 매월 바뀌며 만기별로 다릅니다 (안내 범위 연 3.95~4.25%, 아낌e 기준). 직접 입력하세요'];
+  return { checks, ok: checks.every(x => x[0]), max, rate, rate2: null, rateType: 'fixed', notes, manual: [] };
+}
+function policyCalc(L, listing) {
+  const o = L.opt || {}; const li = listing !== undefined ? listing : S.listings.find(x => x.id === o.listingId && !x.deleted);
+  const c = { price: li ? num(li.price) : num(o.price), areaM2: li ? num(li.areaM2) : num(o.areaM2), income: totalIncome(), metro: !!S.settings.metro };
+  return L.kind === 'didimdol' ? calcDidimdol(o, c) : calcBogeum(o, c);
+}
+const isPolicy = L => L.kind === 'didimdol' || L.kind === 'bogeum';
+
+function usableCapital() { return Math.max(0, sum(live('capital').filter(c => c.liquidity !== 'lock').map(c => num(c.amount))) - num(S.settings.reserve)); }
+function evalScenario(sc) {
+  const li = S.listings.find(x => x.id === sc.listingId && !x.deleted), price = li ? num(li.price) : 0;
+  const lines = (sc.lines || []).map(ln => ({ ln, L: S.loans.find(x => x.id === ln.loanId && !x.deleted) })).filter(o => o.L);
+  const sch = lines.map(o => schedule(o.L, o.ln.amount));
+  const sch1 = lines.map(o => schedule(o.L, o.ln.amount, o.L.rateType === 'variable' ? 1 : 0));
+  const sch2 = lines.map(o => schedule(o.L, o.ln.amount, num(o.L.stress)));
+  const n = Math.max(0, ...sch.map(s => s.length));
+  const tot = (arr, i) => sum(arr.map(s => s[i] ? s[i].pay : 0));
+  const monthly = Array.from({ length: n }, (_, i) => tot(sch, i)), monthly1 = Array.from({ length: n }, (_, i) => tot(sch1, i));
+  const loanTotal = sum(lines.map(o => num(o.ln.amount)));
+  const st = S.settings, costs = price ? price * (num(st.acqTax) + num(st.broker) + num(st.legal)) / 100 + num(st.moving) : 0;
+  const need = price - loanTotal + costs, usable = usableCapital(), gap = usable - need;
+  const incM = totalIncome() / 12, interest = sum(sch.map(s => sum(s.map(r => r.int))));
+  const maxPay = Math.max(0, ...monthly), first = monthly[0] || 0;
+  const dsrPay = sum(sch2.map(s => sum(s.slice(0, 12).map(r => r.pay)))) + sum(live('people').map(p => num(p.debt))) * 12;
+  const e = { sc, li, price, lines, monthly, monthly1, loanTotal, costs, need, usable, gap, incM, interest, maxPay, first,
+    maxPay1: Math.max(0, ...monthly1), years: Math.max(0, ...lines.map(o => num(o.L.years))), ltv: price ? loanTotal / price * 100 : 0,
+    ratio: incM ? maxPay / incM * 100 : 0, dsr: totalIncome() ? dsrPay / totalIncome() * 100 : 0, warns: [], has: !!(li && lines.length) };
+  const W = (code, level, text) => e.warns.push({ code: sc.id + ':' + code, level, text });
+  if (!li) W('nolist', 'info', '매물을 선택하면 필요 현금을 계산합니다.');
+  if (li && !lines.length) W('noloan', 'info', '대출을 하나 이상 골라야 월 상환액이 계산됩니다.');
+  if (e.has) {
+    if (gap < 0) W('short', 'red', `자본 ${won(-gap)} 부족 — 대출을 늘리거나 매물·예비비를 조정해야 합니다.`);
+    else if (gap < price * 0.02) W('thin', 'warn', `자본 여유가 ${won(gap)}로 얇습니다 (이사·수리·세금 변동 대비).`);
+    if (e.ltv > 70) W('ltv', 'warn', `대출 비중 ${e.ltv.toFixed(0)}% — LTV 한도(보통 70%, 규제에 따라 다름)를 넘을 수 있습니다.`);
+    if (incM && e.ratio >= 40) W('ratio', 'red', `최대 월 상환이 월 소득(세전)의 ${e.ratio.toFixed(0)}% — 생활비 압박이 큽니다.`);
+    else if (incM && e.ratio >= 30) W('ratio', 'warn', `최대 월 상환이 월 소득(세전)의 ${e.ratio.toFixed(0)}%입니다.`);
+    if (!incM) W('noinc', 'info', '소득이 입력되지 않아 소득 대비 비율을 계산하지 못했습니다.');
+    if (e.maxPay1 > e.maxPay + 1) W('rate1', 'warn', `변동금리 대출이 +1%p 오르면 최대 월 상환이 ${won(e.maxPay1 - e.maxPay)} 늘어납니다.`);
+    lines.forEach(o => {
+      const L = o.L, a = num(o.ln.amount);
+      if (!a) return;
+      if (isPolicy(L)) {
+        const r = policyCalc(L, li);
+        if (!r.ok) W('el' + L.id, 'red', `${L.name}: 자격 조건 미충족 ${r.checks.filter(x => !x[0]).length}건 (대출 탭에서 확인)`);
+        if (a > r.max) W('lim' + L.id, 'red', `${L.name}: 금액이 예상 한도 ${won(r.max)}를 넘습니다.`);
+        if (L.rateStep) W('step' + L.id, 'warn', `${L.name}: 우대금리 종료(5년 후) 시 금리 ${pct(L.rate)} → ${pct(L.rateStep.rate2)}.`);
+      } else W('apx' + L.id, 'info', `${L.name}은(는) 대략값입니다 — 은행 한도·금리 조회로 확정 필요.`);
+      if (L.method === 'bullet') W('bul' + L.id, 'warn', `${L.name}: 만기일시상환 — 만기에 원금 ${won(a)} 상환(또는 재약정) 필요.`);
+      if (num(L.grace) > 0) W('gr' + L.id, 'info', `${L.name}: 거치 ${L.grace}년 후 월 상환액이 커집니다.`);
+    });
+    if (live('capital').some(c => c.source === 'loan' && num(c.amount) > 0)) W('borrow', 'warn', '자본에 차용금이 포함되어 있습니다 — 상환 부담이 별도로 생깁니다.');
+    if (live('capital').some(c => c.source === 'gift' && num(c.amount) > 0)) W('gift', 'info', '증여 자금 포함 — 증여세·자금조달계획서 확인.');
+    if (e.dsr > 40) W('dsr', 'warn', `단순 DSR 참고치 ${e.dsr.toFixed(0)}% (은행권 규제 기준 40%, 스트레스 금리 반영) — 정책대출의 DSR 적용 여부는 상품별로 확인.`);
+  }
+  return e;
+}
+
+/* ═════════════ 화면 헬퍼 ═════════════ */
+const inp = (c, id, f, v, o = {}) => `<input data-c="${c}" data-id="${id}" data-f="${f}" type="${o.type || 'text'}" value="${esc(v)}" placeholder="${esc(o.ph || '')}" ${o.type === 'number' ? 'inputmode="decimal" step="' + (o.step || 'any') + '"' : ''}>`;
+const sel = (c, id, f, v, opts) => `<select data-c="${c}" data-id="${id}" data-f="${f}">${opts.map(([k, t]) => `<option value="${esc(k)}" ${String(v) === String(k) ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>`;
+const chk = (c, id, f, v, t) => `<label class="chk"><input type="checkbox" data-c="${c}" data-id="${id}" data-f="${f}" ${v ? 'checked' : ''}>${t}</label>`;
+const fld = (label, html, hint) => `<div><label class="f">${label}${html}</label>${hint ? `<p class="hint">${hint}</p>` : ''}</div>`;
+const det = (key, title, body, def) => `<details data-k="${key}" ${(openSet.has(key) || (def && !openSet.has('!' + key))) ? 'open' : ''}><summary>${title}</summary>${body}</details>`;
+const delBtn = (c, id) => `<button class="b danger sm" data-act="del" data-c="${c}" data-id="${id}">삭제</button>`;
+const LIQ = [['now', '즉시 사용'], ['month', '1개월 내'], ['lock', '묶여 있음(계산 제외)']];
+const SRC = [['own', '본인 저축'], ['gift', '증여'], ['loan', '차용']];
+
+/* ═════════════ 탭: 자본 ═════════════ */
+function viewCapital() {
+  const people = live('people'), st = S.settings;
+  const total = sum(live('capital').map(c => num(c.amount)));
+  let h = `<h2>자본</h2><div class="card"><div class="sum">
+    <div><small>총 자본금</small><span class="big">${won(total)}</span></div>
+    <div><small>비상 예비금 차감 후 사용 가능</small><span class="big pos">${won(usableCapital())}</span></div>
+    <div><small>부부합산 연소득</small><span class="big">${won(totalIncome())}</span></div></div>
+    <div class="row" style="margin-top:10px">${fld('비상 예비금 (만원)', inp('settings', '-', 'reserve', st.reserve, { type: 'number' }), '생활비 등으로 남겨둘 금액 · 계산에서 차감')}
+    ${fld('결혼 예정일', inp('settings', '-', 'marriage', st.marriage, { type: 'date' }), '정책대출 신혼 요건(혼인 7년 이내·예비 포함 여부) 확인용')}</div></div>`;
+  people.forEach(p => {
+    const items = live('capital').filter(c => c.owner === p.id), sub = sum(items.map(c => num(c.amount)));
+    h += `<div class="card"><div class="top"><h3>${esc(p.name)} · ${won(sub)}</h3>${people.length > 1 ? delBtn('people', p.id) : ''}</div>
+    <div class="row">${fld('이름', inp('people', p.id, 'name', p.name))}
+    ${fld('연 소득 (세전, 만원)', inp('people', p.id, 'income', p.income, { type: 'number' }), won(p.income))}
+    ${fld('기존 대출 월 상환 (만원)', inp('people', p.id, 'debt', p.debt, { type: 'number' }), '학자금·자동차·카드 할부 등')}</div>`;
+    h += items.length ? items.map(c => `<div class="row" style="border-top:1px solid var(--line);padding-top:8px;margin-top:8px">
+      ${fld('항목', inp('capital', c.id, 'label', c.label, { ph: '예: 예금, 주식, 청약저축' }))}
+      ${fld('금액 (만원)', inp('capital', c.id, 'amount', c.amount, { type: 'number' }), won(c.amount))}
+      ${fld('유동성', sel('capital', c.id, 'liquidity', c.liquidity, LIQ))}
+      ${fld('자금 출처', sel('capital', c.id, 'source', c.source, SRC))}
+      <div class="fit">${delBtn('capital', c.id)}</div></div>`).join('') : '<p class="empty">아직 항목이 없습니다.</p>';
+    h += `<button class="b ghost sm" data-act="addCap" data-owner="${p.id}">+ 자본 항목 추가</button></div>`;
+  });
+  return h + `<button class="b ghost" data-act="addPerson">+ 인원 추가</button>`;
+}
+
+/* ═════════════ 탭: 매물 ═════════════ */
+function criteria(l) {
+  const w = S.settings.w, y = new Date().getFullYear(), has = v => v !== '' && v != null;
+  return [['walk', '역 도보 10분', has(l.walkMin) ? num(l.walkMin) <= 10 : null, w.walk], ['south', '남향', l.direction ? l.direction === '남향' : null, w.south],
+    ['school', '학교 근접', l.school ? true : null, w.school], ['park', '공원 근접', l.park ? true : null, w.park],
+    ['parking', '주차 1대 이상', has(l.parking) ? num(l.parking) >= 1 : null, w.parking], ['year', '입주 15년 이내', has(l.builtYear) ? num(l.builtYear) >= y - 15 : null, w.year]];
+}
+function score(l) { const c = criteria(l), tw = sum(c.map(x => num(x[3]))); return tw ? Math.round(sum(c.filter(x => x[2]).map(x => num(x[3]))) / tw * 100) : 0; }
+function viewListings() {
+  const w = S.settings.w, L = live('listings');
+  let h = `<h2>매물 위시리스트</h2><p class="hint">네이버·카카오 지도에서 단지 링크를 복사해 붙여넣으세요. 가격 시세는 <a href="https://rt.molit.go.kr" target="_blank" rel="noopener">실거래가 공개시스템</a>에서 확인.</p>`;
+  h += L.length ? L.map(l => {
+    const sc = score(l), cr = criteria(l);
+    return `<div class="card"><div class="top"><h3>${esc(l.name || '이름 없음')} · ${won(l.price)}</h3><span class="badge ${sc >= 70 ? 'ok' : 'mid'}">조건 ${sc}점</span></div>
+    <div class="row">${fld('이름(단지명)', inp('listings', l.id, 'name', l.name))}${fld('위치', inp('listings', l.id, 'location', l.location))}
+    ${fld('가격 (만원)', inp('listings', l.id, 'price', l.price, { type: 'number' }), won(l.price))}
+    ${fld('전용면적 (㎡)', inp('listings', l.id, 'areaM2', l.areaM2, { type: 'number' }), l.areaM2 ? '약 ' + (num(l.areaM2) / 3.3058).toFixed(1) + '평' : '')}</div>
+    <div class="row">${fld('입주연도', inp('listings', l.id, 'builtYear', l.builtYear, { type: 'number' }))}${fld('역 도보 (분)', inp('listings', l.id, 'walkMin', l.walkMin, { type: 'number' }))}
+    ${fld('향', sel('listings', l.id, 'direction', l.direction, [['', '모름'], ['남향', '남향'], ['남동향', '남동향'], ['남서향', '남서향'], ['동향', '동향'], ['서향', '서향'], ['북향', '북향']]))}
+    ${fld('주차 (대/세대)', inp('listings', l.id, 'parking', l.parking, { type: 'number', step: '0.1' }))}
+    ${fld('상태', sel('listings', l.id, 'status', l.status, [['관심', '관심'], ['임장완료', '임장 완료'], ['협상중', '협상 중'], ['탈락', '탈락']]))}</div>
+    <div>${chk('listings', l.id, 'school', l.school, '학교 근접')}${chk('listings', l.id, 'park', l.park, '공원 근접')}</div>
+    <div class="row">${fld('지도·매물 링크', inp('listings', l.id, 'url', l.url, { ph: 'https://' }))}${l.url ? `<div class="fit"><a href="${esc(l.url)}" target="_blank" rel="noopener">열기</a></div>` : ''}</div>
+    <div class="row">${fld('장점', `<textarea data-c="listings" data-id="${l.id}" data-f="pros">${esc(l.pros)}</textarea>`)}${fld('단점', `<textarea data-c="listings" data-id="${l.id}" data-f="cons">${esc(l.cons)}</textarea>`)}</div>
+    <p class="hint">${cr.map(x => (x[2] === true ? '✔ ' : x[2] === false ? '✘ ' : '？ ') + x[1]).join(' · ')}</p>
+    <div class="top"><span class="hint">수정: ${esc(l.by || '')}</span>${delBtn('listings', l.id)}</div></div>`;
+  }).join('') : '<p class="empty">관심 매물을 추가해 보세요.</p>';
+  h += `<button class="b" data-act="addListing">+ 매물 추가</button>`;
+  h += det('weights', '조건 점수 가중치', `<div class="row">${[['walk', '역 도보'], ['south', '남향'], ['school', '학교'], ['park', '공원'], ['parking', '주차'], ['year', '연식']].map(([k, t]) => fld(t, inp('settings', '-', 'w.' + k, w[k], { type: 'number' }))).join('')}</div><p class="hint">숫자가 클수록 중요한 조건입니다. 모르는 항목(？)은 점수에 넣지 않습니다.</p>`);
+  return h;
+}
+
+/* ═════════════ 탭: 대출 ═════════════ */
+const METHODS = [['equal', '원리금균등'], ['principal', '원금균등'], ['bullet', '만기일시']];
+function policyPanel(L) {
+  const o = L.opt || {}, r = policyCalc(L), P = POLICY[L.kind], d = L.kind === 'didimdol';
+  const listings = live('listings');
+  let h = `<div class="row">${fld('계산 기준 매물', sel('loans', L.id, 'opt.listingId', o.listingId || '', [['', '직접 가격 입력'], ...listings.map(l => [l.id, `${l.name || '이름 없음'} (${won(l.price)})`])]))}
+    ${o.listingId ? '' : fld('매매가 (만원)', inp('loans', L.id, 'opt.price', o.price, { type: 'number' }))}
+    ${fld('기간', sel('loans', L.id, 'opt.term', o.term, P.terms.map(t => [t, t + '년'])))}</div>
+  <div>${chk('loans', L.id, 'opt.first', o.first, '생애최초 주택구입')}${chk('loans', L.id, 'opt.newly', o.newly, '신혼가구(혼인 7년 이내·결혼예정자 포함)')}</div>
+  <div class="row">${fld('미성년 자녀 수', sel('loans', L.id, 'opt.children', o.children, [[0, '없음'], [1, '1명'], [2, '2명'], [3, '3명 이상']]))}`;
+  if (d) {
+    h += `${fld('순자산 (만원)', inp('loans', L.id, 'opt.netAsset', o.netAsset, { type: 'number' }), '부부합산 · 기준 ' + won(P.netAsset ?? POLICY.didimdol.netAsset) + ' 이하')}
+    ${fld('금리 방식', sel('loans', L.id, 'opt.mode', o.mode || 'var', POLICY.didimdol.modes.map(m => [m[0], m[1]])))}
+    ${fld('청약저축 우대', sel('loans', L.id, 'opt.savings', o.savings || 0, [[0, '해당 없음'], [0.3, '5년↑·60회↑ (0.3%p)'], [0.4, '10년↑·120회↑ (0.4%p)'], [0.5, '15년↑·180회↑ (0.5%p)']]))}</div>
+    <div>${chk('loans', L.id, 'opt.eContract', o.eContract, '부동산 전자계약 (0.1%p, 2026.12.31까지 접수분)')}</div>`;
+  } else {
+    h += `${fld('공시금리 (%)', inp('loans', L.id, 'opt.baseRate', o.baseRate, { type: 'number', step: '0.01' }), '한국주택금융공사 월별 공시 확인')}
+    ${fld('사회적배려 해당 수', sel('loans', L.id, 'opt.social', o.social || 0, [[0, '없음'], [1, '1개 (0.7%p)'], [2, '2개 (1.4%p→한도 1.0%p)']]), '한부모·장애인·다문화·다자녀')}</div>
+    <div>${chk('loans', L.id, 'opt.newborn', o.newborn, '신생아 출산가구(신혼 우대와 중복 불가)')}${chk('loans', L.id, 'opt.green', o.green, '녹색건축물 (0.1%p)')}</div>`;
+  }
+  h += `<div style="margin-top:6px">${r.checks.map(c => `<div class="check"><b class="${c[0] ? 'pos' : 'neg'}">${c[0] ? '✔' : '✘'}</b><span>${esc(c[1])}</span></div>`).join('')}</div>
+  <p style="margin:8px 0 4px"><span class="badge ${r.ok ? 'ok' : 'bad'}">${r.ok ? '자격 충족 예상' : '자격 미충족 항목 있음'}</span>
+  예상 최대 <b>${won(r.max)}</b> · 예상 금리 <b>${pct(r.rate)}</b>${r.rate2 ? ` (5년 후 ${pct(r.rate2)})` : ''}</p>
+  ${r.notes.map(n => `<p class="hint">· ${esc(n)}</p>`).join('')}
+  <p class="hint">직접 확인할 조건: ${P.manual.map(esc).join(' / ')}</p>
+  <button class="b sm" data-act="applyPolicy" data-id="${L.id}">계산값을 이 대출에 적용</button>
+  <p class="hint">출처: ${P.src.map(s => `<a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a>`).join(' · ')}</p>`;
+  return h;
+}
+function yearTable(L) {
+  const rows = schedule(L, L.amount); if (!rows.length) return '<p class="hint">금액·기간을 입력하면 표시됩니다.</p>';
+  let t = `<div class="tw"><table><tr><th>연차</th><th>월 상환(첫 달→마지막 달)</th><th>연 상환</th><th>연 이자</th><th>연말 잔액</th></tr>`;
+  for (let y = 0; y * 12 < rows.length; y++) {
+    const s = rows.slice(y * 12, y * 12 + 12);
+    t += `<tr><td>${y + 1}년차</td><td>${won(s[0].pay)} → ${won(s[s.length - 1].pay)}</td><td>${won(sum(s.map(r => r.pay)))}</td><td>${won(sum(s.map(r => r.int)))}</td><td>${won(s[s.length - 1].bal)}</td></tr>`;
+  }
+  return t + '</table></div>';
+}
+function viewLoans() {
+  const L = live('loans');
+  let h = `<h2>대출</h2>
+  <div class="card"><p style="margin:0 0 6px"><span class="badge off">공식 기준</span> 디딤돌·보금자리론: 기금·주택금융공사 안내 기준(확인일 ${POLICY.verified}). 자격과 금리를 자동 계산합니다.</p>
+  <p style="margin:0"><span class="badge apx">대략값</span> 은행 주담대·신용대출: 직접 고친 값입니다. 실제 한도·금리는 은행 조회로 확정하세요.</p></div>
+  <div class="row noprint" style="margin-bottom:10px">
+    <button class="b fit" data-act="addLoan" data-kind="didimdol">+ 디딤돌</button><button class="b fit" data-act="addLoan" data-kind="bogeum">+ 보금자리론</button>
+    <button class="b ghost fit" data-act="addLoan" data-kind="bank">+ 은행 주담대(대략)</button><button class="b ghost fit" data-act="addLoan" data-kind="credit">+ 신용대출(대략)</button><button class="b ghost fit" data-act="addLoan" data-kind="etc">+ 기타</button></div>`;
+  h += L.length ? L.map(l => {
+    const rows = schedule(l, l.amount), pol = isPolicy(l);
+    return `<div class="card"><div class="top"><h3>${esc(l.name)} <span class="badge ${pol ? 'off' : 'apx'}">${pol ? '공식 기준' : '대략값'}</span></h3>${delBtn('loans', l.id)}</div>
+    ${pol ? det('pol' + l.id, '공식 조건 계산기 (자격 · 한도 · 금리)', policyPanel(l), true) : ''}
+    <div class="row">${fld('상품명', inp('loans', l.id, 'name', l.name))}${fld('대출금액 (만원)', inp('loans', l.id, 'amount', l.amount, { type: 'number' }), won(l.amount))}
+    ${fld('금리 (연 %)', inp('loans', l.id, 'rate', l.rate, { type: 'number', step: '0.01' }), l.rateStep ? `5년 후 ${pct(l.rateStep.rate2)} 가정` : '')}
+    ${fld('기간 (년)', inp('loans', l.id, 'years', l.years, { type: 'number' }))}</div>
+    <div class="row">${fld('상환 방식', sel('loans', l.id, 'method', l.method, METHODS))}${fld('거치 (년)', inp('loans', l.id, 'grace', l.grace, { type: 'number' }), '이자만 내는 기간')}
+    ${fld('금리 유형', sel('loans', l.id, 'rateType', l.rateType, [['variable', '변동'], ['fixed', '고정']]))}
+    ${pol ? '' : fld('스트레스 금리 (%p)', inp('loans', l.id, 'stress', l.stress, { type: 'number', step: '0.1' }), 'DSR 참고 계산용')}</div>
+    ${rows.length ? `<div class="sum" style="margin-top:6px"><div><small>첫 달 상환</small><b>${won(rows[0].pay)}</b></div><div><small>마지막 달 상환</small><b>${won(rows[rows.length - 1].pay)}</b></div>
+      <div><small>총 이자</small><b>${won(sum(rows.map(r => r.int)))}</b></div><div><small>총 기간</small><b>${rows.length}개월(${(rows.length / 12).toFixed(1)}년)</b></div></div>
+      ${det('yr' + l.id, '월·연말 상환 추이 보기', yearTable(l))}` : ''}
+    ${l.verified && pol ? `<p class="hint">공식 기준 적용일 ${esc(l.verified)}</p>` : ''}</div>`;
+  }).join('') : '<p class="empty">대출 상품을 추가하세요.</p>';
+  return h;
+}
+
+/* ═════════════ 탭: 체크리스트 ═════════════ */
+function dday(due) { if (!due) return null; const t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((new Date(due + 'T00:00:00') - t) / 86400000); }
+function viewCheck() {
+  const items = live('checklist').slice().sort((a, b) => (a.done - b.done) || String(a.due || '9').localeCompare(String(b.due || '9')));
+  const done = items.filter(i => i.done).length;
+  let h = `<h2>체크리스트 <span class="badge mid">${done}/${items.length} 완료</span></h2>`;
+  h += items.map(c => { const d = dday(c.due);
+    const b = c.done ? '' : d == null ? '' : d < 0 ? `<span class="badge bad">${-d}일 지남</span>` : d <= 3 ? `<span class="badge bad">D-${d}</span>` : `<span class="badge mid">D-${d}</span>`;
+    return `<div class="card" style="${c.done ? 'opacity:.6' : ''}"><div class="row">
+      <div style="flex:3 1 220px">${chk('checklist', c.id, 'done', c.done, '')}<input style="width:calc(100% - 28px)" data-c="checklist" data-id="${c.id}" data-f="title" value="${esc(c.title)}"></div>
+      ${fld('마감일', inp('checklist', c.id, 'due', c.due, { type: 'date' }))}
+      ${fld('담당', sel('checklist', c.id, 'owner', c.owner, [['', '함께'], ...live('people').map(p => [p.id, p.name])]))}
+      <div class="fit">${b}</div></div>
+      <div class="row">${fld('메모 · 필요 서류', inp('checklist', c.id, 'note', c.note))}<div class="fit">${delBtn('checklist', c.id)}</div></div></div>`; }).join('');
+  h += `<button class="b" data-act="addCheck">+ 항목 추가</button>
+  <p class="hint">마감 알림 메일은 Apps Script의 installDailyTrigger()를 한 번 실행하고, ⚙ 설정에 이메일을 넣으면 매일 아침 발송됩니다.</p>`;
+  return h;
+}
+
+/* ═════════════ 탭: 결론 ═════════════ */
+function chartSVG(evs) {
+  const W = 640, H = 230, pl = 52, pr = 12, pt = 12, pb = 26, maxM = Math.max(12, ...evs.map(e => e.monthly.length));
+  const maxY = Math.max(1, ...evs.map(e => Math.max(0, ...e.monthly, ...e.monthly1))) * 1.1;
+  const X = m => pl + (W - pl - pr) * m / maxM, Y = v => H - pb - (H - pt - pb) * v / maxY;
+  let g = ''; for (let i = 0; i <= 4; i++) { const v = maxY * i / 4, y = Y(v); g += `<line class="grid" x1="${pl}" x2="${W - pr}" y1="${y}" y2="${y}"/><text x="${pl - 6}" y="${y + 4}" text-anchor="end">${won(v).replace('원', '')}</text>`; }
+  const step = maxM > 240 ? 10 : 5; for (let y = 0; y * 12 <= maxM; y += step) g += `<text x="${X(y * 12)}" y="${H - 8}" text-anchor="middle">${y}년</text>`;
+  const lines = evs.map((e, i) => e.monthly.length ? `<polyline class="ln c${i + 1}" points="${e.monthly.map((v, m) => `${X(m).toFixed(1)},${Y(v).toFixed(1)}`).join(' ')}"/>` : '').join('');
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="시나리오별 월 상환액 추이" style="width:100%;height:auto">${g}${lines}</svg>`;
+}
+function viewConclusion() {
+  const st = S.settings, evs = S.scenarios.map(evalScenario), loans = live('loans'), listings = live('listings');
+  let h = `<h2>결론 · 시나리오 비교</h2>`;
+  h += det('costs', '비용·기준 설정', `<div class="row">${fld('취득세·지방교육세 (%)', inp('settings', '-', 'acqTax', st.acqTax, { type: 'number', step: '0.01' }), '6억 이하·85㎡ 이하 일반세율 가정. 감면은 별도 확인')}
+    ${fld('중개보수 (%)', inp('settings', '-', 'broker', st.broker, { type: 'number', step: '0.01' }), '구간별 상한 요율 확인')}
+    ${fld('등기·법무 (%)', inp('settings', '-', 'legal', st.legal, { type: 'number', step: '0.01' }))}
+    ${fld('이사·수리 (만원)', inp('settings', '-', 'moving', st.moving, { type: 'number' }))}</div>
+    <div>${chk('settings', '-', 'metro', st.metro, '수도권·규제지역 매물 (디딤돌 LTV·지방 금리 인하 계산에 사용)')}</div>`);
+  h += evs.map(e => { const sc = e.sc;
+    return `<div class="card"><h3>${esc(sc.name)}</h3><div class="row">${fld('이름', inp('scenarios', sc.id, 'name', sc.name))}
+    ${fld('매물', sel('scenarios', sc.id, 'listingId', sc.listingId, [['', '선택'], ...listings.map(l => [l.id, `${l.name || '이름 없음'} (${won(l.price)})`])]))}</div>
+    <p class="hint" style="margin-top:8px">사용할 대출을 고르고 금액을 조정하세요.</p>
+    ${loans.length ? loans.map(L => { const i = (sc.lines || []).findIndex(x => x.loanId === L.id), on = i >= 0;
+      return `<div class="row" style="align-items:center"><label class="chk" style="flex:2 1 200px"><input type="checkbox" data-act="toggleLine" data-sid="${sc.id}" data-lid="${L.id}" ${on ? 'checked' : ''}>${esc(L.name)} <span class="badge ${isPolicy(L) ? 'off' : 'apx'}" style="margin-left:6px">${isPolicy(L) ? '공식' : '대략'}</span></label>
+      ${on ? fld('금액 (만원)', inp('scenarios', sc.id, 'lines.' + i + '.amount', sc.lines[i].amount, { type: 'number' }), won(sc.lines[i].amount) + ' · ' + pct(L.rate)) : '<div></div>'}</div>`; }).join('') : '<p class="empty">대출 탭에서 상품을 먼저 추가하세요.</p>'}
+    <label class="f" style="margin-top:6px">내가 감수할 점 메모<textarea data-c="scenarios" data-id="${sc.id}" data-f="memo" placeholder="예: 5년 후 금리 상승, 신용대출 만기 연장 필요">${esc(sc.memo)}</textarea></label></div>`; }).join('');
+
+  const rows = [
+    ['매물', e => e.li ? esc(e.li.name || '이름 없음') : '-', null],
+    ['매매가', e => e.price ? won(e.price) : '-', null],
+    ['대출 합계 (비중)', e => e.price ? `${won(e.loanTotal)} (${e.ltv.toFixed(0)}%)` : '-', null],
+    ['필요 현금 (부대비용 포함)', e => e.has ? won(e.need) : '-', e => e.need, -1],
+    ['내 자본 대비', e => e.has ? `<span class="${e.gap < 0 ? 'neg' : 'pos'}">${e.gap < 0 ? '부족 ' + won(-e.gap) : '여유 ' + won(e.gap)}</span>` : '-', e => e.gap, 1],
+    ['첫 달 상환액', e => e.has ? won(e.first) : '-', e => e.first, -1],
+    ['최대 월 상환액', e => e.has ? won(e.maxPay) : '-', e => e.maxPay, -1],
+    ['월 소득 대비(세전)', e => e.has && e.incM ? e.ratio.toFixed(0) + '%' : '-', e => e.incM ? e.ratio : null, -1],
+    ['금리 +1%p 시 최대 월 상환', e => e.has ? won(e.maxPay1) : '-', e => e.maxPay1, -1],
+    ['총 이자', e => e.has ? won(e.interest) : '-', e => e.interest, -1],
+    ['총 상환 기간', e => e.has ? e.years + '년' : '-', e => e.years, -1],
+    ['DSR 참고치', e => e.has && totalIncome() ? e.dsr.toFixed(0) + '%' : '-', null]
+  ];
+  h += `<div class="card"><h3>한눈에 비교</h3><div class="tw"><table><tr><th></th>${evs.map(e => `<th>${esc(e.sc.name)}</th>`).join('')}</tr>`;
+  rows.forEach(([name, f, val, dir]) => {
+    let best = -1, worst = -1;
+    if (val) { const vs = evs.map(e => e.has ? val(e) : null); const ok = vs.filter(v => v != null); if (ok.length >= 2) { const mx = Math.max(...ok), mn = Math.min(...ok); if (mx !== mn) { best = vs.indexOf(dir === 1 ? mx : mn); worst = vs.indexOf(dir === 1 ? mn : mx); } } }
+    h += `<tr><td>${name}</td>${evs.map((e, i) => `<td class="${i === best ? 'best' : i === worst ? 'worst' : ''}">${f(e)}</td>`).join('')}</tr>`;
+  });
+  h += `<tr><td>감수할 점</td>${evs.map(e => `<td class="txt">${e.warns.filter(w => w.level !== 'info').map(w => '· ' + esc(w.text)).join('<br>') || '<span class="hint">두드러진 위험 없음</span>'}${e.sc.memo ? '<br><i>메모: ' + esc(e.sc.memo) + '</i>' : ''}</td>`).join('')}</tr></table></div>
+    <p class="hint">초록 = 비교 항목 중 가장 유리, 빨강 = 가장 불리. 총 이자에는 우대금리 종료·거치 후 상환 증가가 반영됩니다.</p></div>`;
+
+  h += `<div class="card"><h3>월 상환액 추이</h3>${chartSVG(evs)}<div class="legend">${evs.map((e, i) => `<span><i style="background:var(--c${i + 1})"></i>${esc(e.sc.name)}</span>`).join('')}</div>
+    <p class="hint">정책대출 우대 종료 후 상승, 거치 후 증가 등이 그래프의 계단으로 나타납니다.</p></div>`;
+
+  const d = S.decision, pe = evs.find(e => e.sc.id === d.picked);
+  h += `<div class="card"><h3>최종 선택</h3><div>${evs.map(e => `<label class="chk"><input type="radio" name="pick" data-c="decision" data-id="-" data-f="picked" value="${e.sc.id}" ${d.picked === e.sc.id ? 'checked' : ''}>${esc(e.sc.name)}</label>`).join('')}</div>`;
+  if (pe) {
+    const risks = pe.warns.filter(w => w.level !== 'info'), acked = risks.filter(w => d.ack[w.code]).length;
+    h += `<p style="margin:8px 0 4px"><b>${esc(pe.sc.name)}</b> · ${pe.li ? esc(pe.li.name) : '매물 미선택'} · 필요 현금 ${won(pe.need)} · 첫 달 ${won(pe.first)} · 총 ${pe.years}년</p>
+    ${risks.length ? `<p class="hint">감수하기로 한 위험에 체크하세요 (${acked}/${risks.length})</p>${risks.map(w => `<label class="check" style="cursor:pointer"><input type="checkbox" data-c="decision" data-id="-" data-f="ack.${w.code.replace(/\./g, '_')}" ${d.ack[w.code.replace(/\./g, '_')] ? 'checked' : ''}><span>${esc(w.text)}</span></label>`).join('')}` : '<p class="hint">두드러진 위험 항목이 없습니다.</p>'}`;
+  }
+  h += `<label class="f" style="margin-top:6px">결정 메모<textarea data-c="decision" data-id="-" data-f="memo">${esc(d.memo)}</textarea></label>
+    <button class="b ghost sm noprint" onclick="window.print()">인쇄 / PDF로 저장</button></div>`;
+  return h;
+}
+
+/* ═════════════ 렌더링 ═════════════ */
+const TABS = [['capital', '자본', viewCapital], ['listings', '매물', viewListings], ['loans', '대출', viewLoans], ['check', '체크', viewCheck], ['concl', '결론', viewConclusion]];
+function render(fromPull) {
+  const a = document.activeElement;
+  if (fromPull && a && /INPUT|SELECT|TEXTAREA/.test(a.tagName)) { pendingRender = true; return; }
+  pendingRender = false;
+  const y = window.scrollY;
+  const soon = live('checklist').filter(c => !c.done && c.due && dday(c.due) <= 3);
+  $('#app').innerHTML = (soon.length ? `<div class="warn red noprint">마감 임박 ${soon.length}건: ${soon.slice(0, 3).map(c => esc(c.title)).join(', ')}${soon.length > 3 ? ' 외' : ''}</div>` : '') + TABS.find(t => t[0] === tab)[2]();
+  $('#nav').innerHTML = TABS.map(t => `<button data-tab="${t[0]}" aria-current="${t[0] === tab}">${t[1]}</button>`).join('');
+  window.scrollTo(0, y);
+}
+
+/* ═════════════ 이벤트 ═════════════ */
+function setPath(o, path, v) { const p = path.split('.'); let t = o; for (let i = 0; i < p.length - 1; i++) { if (t[p[i]] == null) t[p[i]] = {}; t = t[p[i]]; } t[p[p.length - 1]] = v; }
+function afterEdit() { persist(); scheduleSync(); render(); }
+const app = $('#app');
+app.addEventListener('change', e => {
+  const t = e.target, c = t.dataset.c; if (!c) return;
+  const v = t.type === 'checkbox' ? t.checked : t.type === 'radio' ? t.value : t.type === 'number' ? (t.value === '' ? '' : Number(t.value)) : t.value;
+  if (c === 'settings' || c === 'decision') { setPath(S[c], t.dataset.f, v); S[c]._u = now(); S[c].by = me(); }
+  else { const it = S[c].find(x => x.id === t.dataset.id); if (!it) return; setPath(it, t.dataset.f, v); touch(it); }
+  afterEdit();
+});
+app.addEventListener('toggle', e => { const k = e.target.dataset && e.target.dataset.k; if (!k) return; if (e.target.open) { openSet.add(k); openSet.delete('!' + k); } else { openSet.delete(k); openSet.add('!' + k); } sessionStorage.setItem('open', JSON.stringify([...openSet])); }, true);
+document.addEventListener('focusout', () => { if (pendingRender) setTimeout(() => render(), 50); });
+function add(k, it) { it.id = uid(); it.updatedAt = now(); it.by = me(); S[k].push(it); afterEdit(); }
+document.addEventListener('click', e => {
+  const tb = e.target.closest('[data-tab]'); if (tb) { tab = tb.dataset.tab; render(); window.scrollTo(0, 0); return; }
+  const b = e.target.closest('[data-act]'); if (!b) return; const d = b.dataset;
+  if (b.tagName === 'INPUT') return;
+  switch (d.act) {
+    case 'addPerson': add('people', { name: '새 인원', income: 0, debt: 0 }); break;
+    case 'addCap': add('capital', { owner: d.owner, label: '', amount: 0, liquidity: 'now', source: 'own' }); break;
+    case 'addListing': add('listings', { name: '', location: '', price: 0, areaM2: '', builtYear: '', walkMin: '', direction: '', parking: '', status: '관심', url: '', pros: '', cons: '', school: false, park: false }); break;
+    case 'addCheck': add('checklist', { title: '새 항목', owner: '', due: '', done: false, note: '' }); break;
+    case 'addLoan': addLoan(d.kind); break;
+    case 'applyPolicy': applyPolicy(d.id); break;
+    case 'del': { if (!confirm('삭제할까요?')) return; const it = S[d.c].find(x => x.id === d.id); if (it) { it.deleted = true; touch(it); afterEdit(); } break; }
+  }
+});
+document.addEventListener('change', e => {
+  const t = e.target; if (t.dataset.act !== 'toggleLine') return;
+  const sc = S.scenarios.find(x => x.id === t.dataset.sid), L = S.loans.find(x => x.id === t.dataset.lid); sc.lines = sc.lines || [];
+  if (t.checked) sc.lines.push({ loanId: L.id, amount: num(L.amount) }); else sc.lines = sc.lines.filter(x => x.loanId !== L.id);
+  touch(sc); afterEdit();
+});
+function addLoan(kind) {
+  const base = { id: uid(), kind, name: '', amount: 0, rate: 0, years: 30, method: 'equal', grace: 0, rateType: 'variable', stress: 0, rateStep: null, updatedAt: now(), by: me() };
+  if (kind === 'didimdol') Object.assign(base, { name: POLICY.didimdol.label, opt: { listingId: '', price: 0, term: 30, first: false, newly: false, children: 0, netAsset: 0, mode: 'var', savings: 0, eContract: false } });
+  else if (kind === 'bogeum') Object.assign(base, { name: POLICY.bogeum.label, rateType: 'fixed', opt: { listingId: '', price: 0, term: 30, first: false, newly: false, children: 0, baseRate: 4.1, social: 0, newborn: false, green: false } });
+  else if (kind === 'bank') Object.assign(base, { name: '은행 주담대 (대략)', rate: 4.0, stress: 3.0 });
+  else if (kind === 'credit') Object.assign(base, { name: '신용대출 (대략)', rate: 5.5, years: 5, method: 'bullet', stress: 1.5 });
+  else Object.assign(base, { name: '기타 대출', rate: 4.0 });
+  S.loans.push(base); afterEdit();
+}
+function applyPolicy(id) {
+  const L = S.loans.find(x => x.id === id), r = policyCalc(L);
+  L.amount = r.max; L.rate = Math.round(r.rate * 100) / 100; L.years = num(L.opt.term); L.rateType = r.rateType; L.method = L.method === 'bullet' ? 'equal' : L.method;
+  L.rateStep = r.rate2 ? { afterMonths: 60, rate2: Math.round(r.rate2 * 100) / 100 } : null; L.verified = POLICY.verified; touch(L); afterEdit();
+}
+
+/* ═════════════ 저장 · 동기화 ═════════════ */
+function persist() { localStorage.setItem(LS, JSON.stringify(S)); dirty = true; localStorage.setItem(LSD, '1'); }
+function setStatus(k, msg) {
+  const el = $('#sync'); el.className = 'chip' + (k === 'err' ? ' err' : '');
+  el.textContent = { local: '로컬 저장', saving: '저장 중…', ok: '시트 저장됨 ' + new Date().toTimeString().slice(0, 5), offline: '오프라인(재시도)', err: '오류: ' + (msg || '') }[k];
+}
+async function api(action, p = {}) {
+  const res = await fetch(cfg.url, { method: 'POST', body: JSON.stringify(Object.assign({ action, key: cfg.key }, p)), redirect: 'follow' });
+  return res.json();
+}
+function merge(l, r) {
+  if (!r) return l; const out = Object.assign({}, l);
+  for (const k of ['people', 'capital', 'listings', 'loans', 'checklist', 'scenarios']) {
+    const m = new Map(); (r[k] || []).forEach(x => m.set(x.id, x));
+    (l[k] || []).forEach(x => { const y = m.get(x.id); if (!y || num(x.updatedAt) >= num(y.updatedAt)) m.set(x.id, x); }); out[k] = [...m.values()];
+  }
+  for (const k of ['settings', 'decision']) out[k] = num((l[k] || {})._u) >= num((r[k] || {})._u) ? l[k] : r[k];
+  return normalize(out);
+}
+let timer = null;
+function scheduleSync() { if (!cfg.url || !cfg.key) { setStatus('local'); return; } clearTimeout(timer); timer = setTimeout(sync, 1200); }
+async function sync() {
+  if (!cfg.url || !cfg.key) return setStatus('local');
+  if (syncing) { again = true; return; }
+  syncing = true; setStatus('saving');
+  try {
+    let r = await api('save', { baseVersion: ver, state: S, by: me() });
+    for (let i = 0; r.ok && r.conflict && i < 3; i++) { S = merge(S, r.state); ver = r.version; persist(); r = await api('save', { baseVersion: ver, state: S, by: me(), force: i === 2 }); }
+    if (r.ok && !r.conflict) { ver = r.version; dirty = false; localStorage.setItem(LSD, '0'); setStatus('ok'); render(true); } else setStatus('err', r.error || '저장 실패');
+  } catch (err) { setStatus('offline'); }
+  syncing = false; if (again) { again = false; sync(); }
+}
+async function pull() {
+  if (!cfg.url || !cfg.key || syncing) return;
+  try {
+    const r = await api('load'); if (!r.ok) return setStatus('err', r.error);
+    if (r.state && r.version !== ver) { S = merge(S, r.state); ver = r.version; localStorage.setItem(LS, JSON.stringify(S)); render(true); }
+    ver = r.version;
+    if (dirty) sync(); else setStatus('ok');
+  } catch (err) { setStatus('offline'); }
+}
+setInterval(pull, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) pull(); });
+window.addEventListener('online', () => { dirty = true; sync(); });
+
+/* ═════════════ 설정 · 백업 ═════════════ */
+const dlg = $('#dlg');
+$('#btnCfg').onclick = () => { $('#cfgMe').value = cfg.me || ''; $('#cfgUrl').value = cfg.url || ''; $('#cfgKey').value = cfg.key || ''; $('#cfgMail').value = S.settings.emails || ''; dlg.showModal(); };
+$('#cfgClose').onclick = () => dlg.close();
+$('#cfgSave').onclick = async () => {
+  cfg = { me: $('#cfgMe').value.trim(), url: $('#cfgUrl').value.trim(), key: $('#cfgKey').value.trim() };
+  localStorage.setItem(LSC, JSON.stringify(cfg));
+  S.settings.emails = $('#cfgMail').value.trim(); S.settings._u = now(); S.settings.by = me(); persist();
+  dlg.close(); setStatus(cfg.url ? 'saving' : 'local'); await pull(); render();
+};
+$('#btnExport').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' })); a.download = 'home-planner-' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); };
+$('#btnImport').onclick = () => $('#fileImport').click();
+$('#fileImport').onchange = e => { const f = e.target.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { try { S = normalize(JSON.parse(rd.result)); S.settings._u = now(); persist(); scheduleSync(); render(); dlg.close(); } catch (x) { alert('JSON 파일을 읽지 못했습니다.'); } }; rd.readAsText(f); };
+$('#btnReset').onclick = () => { if (confirm('이 기기에 저장된 데이터를 지웁니다. 구글 시트의 데이터는 그대로 남습니다.')) { localStorage.removeItem(LS); localStorage.removeItem(LSD); location.reload(); } };
+
+/* ═════════════ 시작 ═════════════ */
+render();
+if (cfg.url && cfg.key) { setStatus('saving'); pull(); } else setStatus('local');
+</script>
+</body>
+</html>
